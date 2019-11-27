@@ -32,7 +32,6 @@ class simulation_system(Queue):
         cur = connection.cursor()
         cur.execute("SELECT * FROM dataset ORDER BY arrival ASC")
         tasksList = cur.fetchall()
-        print(tasksList)
         for i in tasksList:
             self.q.enqueue(i)
         self.clock = 0
@@ -104,7 +103,7 @@ class simulation_system(Queue):
             else:
                 self.enter_system()
         except:
-            self.complete_tasks2()
+            print(f"** [{self.clock}] : Task [{self.processor1[0][0]}] completed.")
 
     def complete_tasks2(self):
         try:
@@ -123,7 +122,7 @@ class simulation_system(Queue):
             else:
                 self.enter_system()
         except:
-            self.complete_tasks3()
+            print(f"** [{self.clock}] : Task [{self.processor2[0][0]}] completed.")
 
     def complete_tasks3(self):
         try:
@@ -143,7 +142,11 @@ class simulation_system(Queue):
             else:
                 self.enter_system()
         except:
-            print(f"[{self.clock}] : SIMULATION COMPLETED.")
+            try:
+                print(f"** [{self.clock}] : Task [{self.processor3[0][0]}] completed.")
+                print(f"[{self.clock}] : SIMULATION COMPLETED.")
+            except:
+                print(f"[{self.clock}] : SIMULATION COMPLETED.")
 
 
 
