@@ -5,21 +5,27 @@ class Queue(object):
     def __init__(self):
         self.p1 = []
         self.p2 = []
+
     def enqueue(self, item):
         self.p1.append(item)
+
     def dequeue(self):
         self.front()
         return self.p2.pop()
+
     def front(self):
         if not self.p2:
             while self.p1:
                     self.p2.append(self.p1.pop())
         return self.p2[-1]
+
     def isEmpty(self):
         return not self.p1 and not self.p2
 
 class simulation_system(Queue):
+
 # _________________________________INITIALISE SYSTEM_________________________________________________________
+
     def init_system(self):
         self.q = Queue()
         connection = sqlite3.connect('Simulation_data.db')
@@ -39,7 +45,6 @@ class simulation_system(Queue):
 
 # _________________________________FILTER TASKS_____________________________________________________
     def enter_system(self):
-
         if not self.q.isEmpty():
             EnteringItem = self.q.front()
             self.clock = EnteringItem[1]
@@ -90,6 +95,7 @@ class simulation_system(Queue):
         self.clock = AssignedItem[1]
         print(f"** [{self.clock}] : Task [{AssignedItem[0][0]}] completed.")
         AssignedItem.clear()
+
     def complete_tasks(self):
         try:
             EnteringItem = self.q.front()
@@ -207,7 +213,6 @@ class simulation_system(Queue):
                 self.endpoint3()
             if len(self.processor1):
                 self.endpoint1()
-
 
     def endpoint3(self):
             processor = self.processor3
