@@ -30,8 +30,9 @@ class simulation_system(Queue):
         self.q = Queue()
         connection = sqlite3.connect('Simulation_data.db')
         cur = connection.cursor()
-        cur.execute("SELECT * FROM dataset ORDER BY arrival ASC")
+        cur.execute("SELECT id, arrival, duration FROM dataset ORDER BY arrival ASC")
         tasksList = cur.fetchall()
+        print(tasksList)
         for i in tasksList:
             self.q.enqueue(i)
         self.clock = 0
@@ -41,7 +42,7 @@ class simulation_system(Queue):
         self.processor3 = []
         connection.commit()
         connection.close()
-        return print("** SYSTEM INITIALISED **")
+        print("** SYSTEM INITIALISED **")
 
 # _________________________________FILTER TASKS_____________________________________________________
     def enter_system(self):
@@ -120,7 +121,7 @@ class simulation_system(Queue):
                 self.processing(AssignedItem)
                 self.complete_tasks2()
 
-            else: 
+            else:
                 self.complete_tasks2()
         except:
             self.complete_tasks2()
@@ -171,7 +172,7 @@ class simulation_system(Queue):
         except:
             self.enter_system()
 
-# _________________________________LAST TASKS PROCESSING__________________________________________
+# _________________________________LAST TASKS PROCESSING WHEN EVERYTASKS ARE DEQUEUED__________________________________________
     def onHoldEnd(self, processor, num):
         processor.append(self.onHold[0])
         print(f"** [{self.clock}] : Task [{processor[0][0]}] assigned to processor [{num}]")

@@ -15,28 +15,18 @@ def insert_database():
     connection = sqlite3.connect('Simulation_data.db')
     cur = connection.cursor()
     cur.execute("""CREATE TABLE IF NOT EXISTS dataset (
-    id TEXT PRIMARY KEY UNIQUE NOT NULL,
+    useless_primary_key INTEGER PRIMARY KEY AUTOINCREMENT,
+    id TEXT NOT NULL,
     arrival REAL NOT NULL,
     duration INTEGER NOT NULL
     )""")
-    cur.execute("SELECT * FROM dataset ORDER BY arrival ASC")
     if len(cur.fetchall()) < 100:
         for _ in range(100):
             ID = id_generator()
             Arrival = random.uniform(1,100)
             Duration = round(random.expovariate(1))+1
             cur.execute("INSERT INTO dataset(id, arrival, duration) VALUES(?,?,?)", (ID, Arrival, Duration))
-    cur.execute("SELECT * FROM dataset ORDER BY arrival ASC")
     connection.commit()
     connection.close()
 
 insert_database()
-
-
-
-   
-
-
-
- 
-
