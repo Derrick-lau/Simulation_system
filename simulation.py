@@ -32,7 +32,6 @@ class simulation_system(Queue):
         cur = connection.cursor()
         cur.execute("SELECT id, arrival, duration FROM dataset ORDER BY arrival ASC")
         tasksList = cur.fetchall()
-        print(tasksList)
         for i in tasksList:
             self.q.enqueue(i)
         self.clock = 0

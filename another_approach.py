@@ -21,7 +21,7 @@ class Queue(object):
         return self.p2[-1]
 
     def isEmpty(self):
-        return nself.p1 and not self.p2
+        return self.p1 and not self.p2
 
 
 class simulation_system(Queue):
@@ -30,8 +30,9 @@ class simulation_system(Queue):
         self.q = Queue()
         connection = sqlite3.connect('Simulation_data.db')
         cur = connection.cursor()
-        cur.execute("SELECT * FROM dataset ORDER BY arrival ASC")
+        cur.execute("SELECT id, arrival, duration FROM dataset ORDER BY arrival ASC")
         tasksList = cur.fetchall()
+        print(tasksList)
         for i in tasksList:
             self.q.enqueue(i)
         self.clock = 0
@@ -132,6 +133,15 @@ class simulation_system(Queue):
                             self.clock = AssignedItem[1]
                             print(f"** [{self.clock}] : Task [{AssignedItem[0][0]}] completed.")
                             AssignedItem.clear()
+                            if not len(self.processor1):
+                                self.assign_tasks(processor1)
+
+                            if not len(self.processor2):
+                                self.assign_tasks(processor2)
+
+                            if not len(self.processor3):
+                                self.assign_tasks(processor3)
+                            
 
                 if len(self.onHold) > 0:
                     EnteringItem = self.onHold[0]
@@ -142,8 +152,71 @@ class simulation_system(Queue):
                             self.clock = AssignedItem[1]
                             print(f"** [{self.clock}] : Task [{AssignedItem[0][0]}] completed.")
                             AssignedItem.clear()
-                # self.task_processing(processor = processor2, anotherprocessor1 = processor3, anotherprocessor2 = processor1)
-                # self.task_processing(processor = processor3, anotherprocessor1 = processor1, anotherprocessor2 = processor2)
+
+
+
+                EnteringItem = self.q.front()
+                processor = self.processor2
+                AssignedItem = processor[0]
+                anotherprocessor1 = self.processor3
+                anotherprocessor2 = self.processor1
+                if len(self.onHold) >= 1 and AssignedItem[1] < anotherprocessor1[1] and AssignedItem[1] < anotherprocessor1[1] and AssignedItem[1] < EnteringItem[1]:
+                    if not len(anotherprocessor1) or AssignedItem[1] < anotherprocessor1[1]:
+                        if not len(anotherprocessor2) and AssignedItem[1] < anotherprocessor2[1]:
+                            self.clock = AssignedItem[1]
+                            print(f"** [{self.clock}] : Task [{AssignedItem[0][0]}] completed.")
+                            AssignedItem.clear()
+                            if not len(self.processor1):
+                                self.assign_tasks(processor1)
+
+                            if not len(self.processor2):
+                                self.assign_tasks(processor2)
+
+                            if not len(self.processor3):
+                                self.assign_tasks(processor3)
+                            
+
+                if len(self.onHold) > 0:
+                    EnteringItem = self.onHold[0]
+
+                if EnteringItem[1] > AssignedItem[1]:
+                    if len(anotherprocessor1) and AssignedItem[1] > anotherprocessor1[1]:
+                        if len(anotherprocessor2) and AssignedItem[1] > anotherprocessor2[1]:
+                            self.clock = AssignedItem[1]
+                            print(f"** [{self.clock}] : Task [{AssignedItem[0][0]}] completed.")
+                            AssignedItem.clear()
+
+                            
+                EnteringItem = self.q.front()
+                processor = self.processor3
+                AssignedItem = processor[0]
+                anotherprocessor1 = self.processor1
+                anotherprocessor2 = self.processor2
+                if len(self.onHold) >= 1 and AssignedItem[1] < anotherprocessor1[1] and AssignedItem[1] < anotherprocessor1[1] and AssignedItem[1] < EnteringItem[1]:
+                    if not len(anotherprocessor1) or AssignedItem[1] < anotherprocessor1[1]:
+                        if not len(anotherprocessor2) and AssignedItem[1] < anotherprocessor2[1]:
+                            self.clock = AssignedItem[1]
+                            print(f"** [{self.clock}] : Task [{AssignedItem[0][0]}] completed.")
+                            AssignedItem.clear()
+                            if not len(self.processor1):
+                                self.assign_tasks(processor1)
+
+                            if not len(self.processor2):
+                                self.assign_tasks(processor2)
+
+                            if not len(self.processor3):
+                                self.assign_tasks(processor3)
+                            
+
+                if len(self.onHold) > 0:
+                    EnteringItem = self.onHold[0]
+
+                if EnteringItem[1] > AssignedItem[1]:
+                    if len(anotherprocessor1) and AssignedItem[1] > anotherprocessor1[1]:
+                        if len(anotherprocessor2) and AssignedItem[1] > anotherprocessor2[1]:
+                            self.clock = AssignedItem[1]
+                            print(f"** [{self.clock}] : Task [{AssignedItem[0][0]}] completed.")
+                            AssignedItem.clear()
 
 
 
