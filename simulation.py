@@ -6,14 +6,14 @@ class Queue(object):
         self.p1 = []
         self.p2 = []
 
-    def enqueue(self, item):
+    def enqueue(self, item):#O(1)
         self.p1.append(item)
 
-    def dequeue(self):
+    def dequeue(self):      #O(1)
         self.front()
         return self.p2.pop()
 
-    def front(self):
+    def front(self):        #O(1) : this is a fuction this system required but built-in module doesn't have
         if not self.p2:
             while self.p1:
                     self.p2.append(self.p1.pop())
@@ -24,7 +24,7 @@ class Queue(object):
 
 class simulation_system(Queue):
 
-# _________________________________INITIALISE SYSTEM_________________________________________________________
+########################################INITIALISE SYSTEM######################################################################################################################
 
     def init_system(self):
         self.q = Queue()
@@ -43,201 +43,151 @@ class simulation_system(Queue):
         connection.close()
         print("** SYSTEM INITIALISED **")
 
-# _________________________________FILTER TASKS_____________________________________________________
-    def enter_system(self):
-        if not self.q.isEmpty():
+# #######################Belows are the function prepared to run the system#####################################################################################################
+
+
+    def entering_system(self):
+            # entering
             EnteringItem = self.q.front()
             self.clock = EnteringItem[1]
             print(f"** [{self.clock}] : Task [{EnteringItem[0]}] with duration [{EnteringItem[2]}] enters the system.")
-            pattern = re.compile(r"((?=.*[\d])(?=.*[a-z])(?=.*[A-Z])|(?=.*[\d])(?=.*[a-zA-Z])(?=.*[@#*&_-])|(?=.*[a-z])(?=.*[A-Z])(?=.*[@#*&_-])).*")
 
-            if pattern.match(EnteringItem[0]):
-                print(f"** Task [{EnteringItem[0]}] accepted.")
-                self.assign_processor()
-            else:
-                print(f"** Task [{EnteringItem[0]}] unfeasible and discarded.")
-                self.q.dequeue()
-                self.complete_tasks()
-        else:
-            self.endpoint1()
-# _________________________________ASSIGN TASKS TO PROCESSORS________________________________________________________
+            # filtering
+            pattern = re.compile(r"((?=.*[\d])(?=.*[a-z])(?=.*[A-Z])|(?=.*[\d])(?=.*[a-zA-Z])(?=.*[@#*&_-])|(?=.*[a-z])(?=.*[A-Z])(?=.*[@#*&_-])).*")
+            if True:
+                if pattern.match(EnteringItem[0]):
+                    print(f"** Task [{EnteringItem[0]}] accepted.\n")
+                    self.taskAcceptButNotYetAssignedOrHold = 1
+                else:
+                    print(f"** Task [{EnteringItem[0]}] unfeasible and discarded.\n")
+                    self.q.dequeue()
+
     def assign_tasks(self, processor, num):
+
+        #assigning if tasks onHold
         if self.onHold:
             processor.append(self.onHold[0])
             print(f"** [{self.clock}] : Task [{processor[0][0]}] assigned to processor [{num}]")
             self.onHold.pop(0)
+
+        #assigning if nothing is onHold
         else:
             processor.append(self.q.front())
+            self.q.dequeue()
             print(f"** [{self.clock}] : Task [{processor[0][0]}] assigned to processor [{num}]")
-            self.q.dequeue()
-        self.clock += processor[0][2]
-        processor.append(self.clock)
-        self.complete_tasks()
+            self.taskAcceptButNotYetAssignedOrHold = 0
+        processor.append(self.clock + processor[0][2])
 
-    def assign_processor(self):
-        EnteringItem = self.q.front()
-        if not len(self.processor1):
-            processor = self.processor1
-            self.assign_tasks(processor, 1)
-        elif not len(self.processor2):
-            processor = self.processor2
-            self.assign_tasks(processor, 2)
-        elif not len(self.processor3):
-            processor = self.processor3
-            self.assign_tasks(processor, 3)
-        else:
-            print(f'** Task [{EnteringItem[0]}] on hold')
-            self.onHold.append(self.q.front())
-            self.q.dequeue()
-            self.complete_tasks()
-# _________________________________PROCESSING____________________________________________________________________________________________
-    def processing(self, AssignedItem):
-        self.clock = AssignedItem[1]
-        print(f"** [{self.clock}] : Task [{AssignedItem[0][0]}] completed.")
-        AssignedItem.clear()
-
-    def complete_tasks(self):
-        try:
-            EnteringItem = self.q.front()
-            AssignedItem = self.processor1
-            if len(self.onHold) >= 1 and AssignedItem[1] < self.processor2[1] and AssignedItem[1] < self.processor2[1] and AssignedItem[1] < EnteringItem[1]:
-                if len(self.processor2) and AssignedItem[1] > self.processor2[1]:
-                    self.complete_tasks2()
-                if len(self.processor3) and AssignedItem[1] > self.processor3[1]:
-                    self.complete_tasks3()
-                self.processing(AssignedItem)
-                self.assign_processor()
-
-            if len(self.onHold) > 0:
-                EnteringItem = self.onHold[0]
-
-            if EnteringItem[1] > AssignedItem[1]:
-                if len(self.processor2) and AssignedItem[1] > self.processor2[1]:
-                    self.complete_tasks2()
-                if len(self.processor3) and AssignedItem[1] > self.processor3[1]:
-                    self.complete_tasks3()
-                self.clock = AssignedItem[1]
-                self.processing(AssignedItem)
-                self.complete_tasks2()
-
-            else:
-                self.complete_tasks2()
-        except:
-            self.complete_tasks2()
-
-    def complete_tasks2(self):
-        try:
-            EnteringItem = self.q.front()
-            AssignedItem = self.processor2
-            if len(self.onHold) >= 1 and AssignedItem[1] < self.processor1[1] and AssignedItem[1] < self.processor3[1] and AssignedItem[1] < EnteringItem[1]:
-                if len(self.processor3) and AssignedItem[1] > self.processor3[1]:
-                    self.complete_tasks3()
-                self.processing(AssignedItem)
-                self.assign_processor()
-
-            if len(self.onHold) > 0:
-                EnteringItem = self.onHold[0]
-
-            if EnteringItem[1] > AssignedItem[1]:
-                if len(self.processor3) and AssignedItem[1] > self.processor3[1]:
-                    self.complete_tasks3()
-                self.processing(AssignedItem)
-                self.complete_tasks3()
-            else:
-                self.complete_tasks3()
-        except:
-            self.complete_tasks3()
-
-    def complete_tasks3(self):
-        try:
-            EnteringItem = self.q.front()
-            AssignedItem = self.processor3
-            if len(self.onHold) and AssignedItem[1] < self.processor2[1] and AssignedItem[1] < self.processor1[1] and AssignedItem[1] < EnteringItem[1]:
-                if len(self.processor1) and AssignedItem[1] > self.processor1[1]:
-                    self.complete_tasks()
-                self.processing(AssignedItem)
-                self.assign_processor()
-
-            if len(self.onHold):
-                EnteringItem = self.onHold[0]
-
-            if EnteringItem[1] > AssignedItem[1]:
-                if len(self.processor1) and AssignedItem[1] > self.processor1[1]:
-                    self.complete_tasks()
-                self.processing(AssignedItem)
-                self.complete_tasks()
-            else:
-                self.enter_system()
-        except:
-            self.enter_system()
-
-# _________________________________LAST TASKS PROCESSING WHEN EVERYTASKS ARE DEQUEUED__________________________________________
-    def onHoldEnd(self, processor, num):
-        processor.append(self.onHold[0])
-        print(f"** [{self.clock}] : Task [{processor[0][0]}] assigned to processor [{num}]")
-        self.onHold.pop(0)
-        self.clock += processor[0][2]
-        processor.append(self.clock)
-
-    def processorEnd(self, processor):
+        #processing by processor
+    def completing (self, processor):
         self.clock = processor[1]
         print(f"** [{self.clock}] : Task [{processor[0][0]}] completed.")
         processor.clear()
 
-    def endpoint1(self):
-            processor = self.processor1
-            if len(processor):
-                if len(self.processor2) and processor[1] > self.processor2[1]:
-                    self.endpoint2()
-                if len(self.processor3) and processor[1] > self.processor3[1]:
-                    self.endpoint3()
-                self.processorEnd(processor)
-            if self.onHold:
-                self.onHoldEnd(processor, 1)
-            if len(self.processor2):
-                self.endpoint2()
-            if len(self.processor3):
-                self.endpoint3()
 
-    def endpoint2(self):
-            processor = self.processor2
-            if len(processor):
-                if len(self.processor3) and processor[1] > self.processor3[1]:
-                    self.endpoint3()
-                if len(self.processor1) and processor[1] > self.processor1[1]:
-                    self.endpoint1()
-                self.processorEnd(processor)
-            if self.onHold:
-                self.onHoldEnd(processor, 2)
-            if len(self.processor3):
-                self.endpoint3()
-            if len(self.processor1):
-                self.endpoint1()
+################################## run_system is actually running the system#######################################################################################################
+    def run_system(self):
 
-    def endpoint3(self):
-            processor = self.processor3
-            if len(processor):
-                if len(self.processor1) and processor[1] > self.processor1[1]:
-                    self.endpoint1()
-                if len(self.processor2) and processor[1] > self.processor2[1]:
-                    self.endpoint2()
-                self.processorEnd(processor)
-            if self.onHold:
-                self.onHoldEnd(processor, 3)
-            if len(self.processor1):
-                self.endpoint1()
-            if len(self.processor2):
-                self.endpoint2()
+            processor1 = self.processor1
+            processor2 = self.processor2
+            processor3 = self.processor3
 
-# _________________________________SYSTEM ENDED______________________________________________________
-    def ending(self):
+            completion_time1 = 110#These are default values for comparison when nothing in processor 1 or 2 or 3.
+            completion_time2 = 111#These values will be set back to default when a task completed.
+            completion_time3 = 112#
+
+            self.taskAcceptButNotYetAssignedOrHold = 0 # when a task get accepted but not yet assigned or onHold, it increases to 1.
+
+            ################################################### Start - Let tasks enter##############################################################
+            while not self.q.isEmpty(): # loop until queue is empty
+                firstItem = self.q.front()
+
+                #completion time for each processors should be greater than the first item's arrival in the queue if the first item needs to enter the system.
+                if self.q.front()[1] <= completion_time1 and firstItem[1] <= completion_time2 and firstItem[1] <= completion_time3:
+                    if  firstItem[1] <= completion_time1 and firstItem[1] <= completion_time2 and firstItem[1] <= completion_time3:
+                        if self.onHold:
+                            if onHold_completion_time <= firstItem[1]:
+                                pass
+                        self.entering_system()
+
+
+            #################################################### assigning tasks#################################################################
+
+                #if nothing is in processors and tasks got accepted or onhold and the first Item's arrival in the queue less than or equal to processors' completion time:
+
+                if not len(processor1) and self.taskAcceptButNotYetAssignedOrHold:
+                    if firstItem[1] <= completion_time1 and firstItem[1] <= completion_time2 and firstItem[1] <= completion_time3:
+                        self.assign_tasks(processor1, 1)
+                        completion_time1 = processor1[1]
+
+                if not len(processor2) and self.taskAcceptButNotYetAssignedOrHold:
+                    if firstItem[1] <= completion_time1 and firstItem[1] <= completion_time2 and firstItem[1] <= completion_time3:
+                        self.assign_tasks(processor2, 2)
+                        completion_time2 = processor2[1]
+
+                if not len(processor3) and self.taskAcceptButNotYetAssignedOrHold:
+                    if firstItem[1] <= completion_time1 and firstItem[1] <= completion_time2 and firstItem[1] <= completion_time3:
+                        self.assign_tasks(processor3, 3)
+                        completion_time3 = processor3[1]
+
+                #if processors are full, onHold
+                if len(self.processor1) and len(self.processor2) and len(self.processor3) and self.taskAcceptButNotYetAssignedOrHold:
+                    print(f'** Task [{firstItem[0]}] on hold\n')
+                    self.onHold.append(firstItem)
+                    onHold_completion_time = self.clock + self.onHold[0][2]
+                    self.taskAcceptButNotYetAssignedOrHold = 0
+                    self.q.dequeue()
+
+            ################################################# processing tasks###################################################
+
+                #comparing the completion time among processors
+                if completion_time1 <= firstItem[1] and completion_time1 <= completion_time2 and completion_time1 <= completion_time3:
+                        self.completing (processor1)
+                        completion_time1 = 110
+
+                if completion_time2 <= firstItem[1] and completion_time2 <= completion_time3 and completion_time2 <= completion_time1:
+                    if completion_time2 < completion_time3:
+                        self.completing (processor2)
+                        completion_time2 = 111
+
+                if completion_time3 <= firstItem[1] and completion_time3 <= completion_time1 and completion_time3 <= completion_time2:
+                        self.completing (processor3)
+                        completion_time3 = 112
+
+###########################################clear tasks that remain in processors and onHold  while the queue is empty############################################################
+
+            while len(processor1) or len(processor2) or len(processor3):
+
+                if completion_time1 <= completion_time2 and completion_time1 <= completion_time3:
+                    self.completing(processor1)
+                    completion_time1 = 110
+                    if self.onHold:
+                        self.assign_tasks(processor1, 1)
+                        completion_time1 = processor1[1]
+
+                if completion_time2 <= completion_time3 and completion_time2 <= completion_time1:
+                    self.completing(processor2)
+                    completion_time2 = 111
+                    if self.onHold:
+                        self.assign_tasks(processor2, 1)
+                        completion_time2 = processor2[1]
+
+                if completion_time3 <= completion_time1 and completion_time3 <= completion_time2:
+                    self.completing(processor3)
+                    completion_time3 = 112
+                    if self.onHold:
+                        self.assign_tasks(processor3, 1)
+                        completion_time3 = processor3[1]
+
+
+##########################################################Ending##############################################################################################
+
+    def end (self):
+
         print(f'** [{self.clock}] : SIMULATION COMPLETED. **')
 
-# _________________________________RUN SYSTEM_____________________________________________
-Simulation = simulation_system()
-try:
-    InitSystem = Simulation.init_system()
-    StartSystem = Simulation.enter_system()
-except:
-    pass
-EndSystem = Simulation.ending()
+#####################################################Class instantiation######################################################################################
+simulation = simulation_system()
+InitSystem = simulation.init_system()
+Enter_system = simulation.run_system()
+end_system = simulation.end()
