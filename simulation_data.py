@@ -1,10 +1,11 @@
 import random
 import string
 import sqlite3
+import math
 
 def id_generator():
     id_num=''
-    length=6
+    length=8
     id_num += string.digits
     id_num += string.ascii_letters
     id_num += "@#*&_-"
@@ -20,12 +21,12 @@ def insert_database():
     arrival REAL NOT NULL,
     duration INTEGER NOT NULL
     )""")
-    if len(cur.fetchall()) < 100:
-        for _ in range(100):
-            ID = id_generator()
-            Arrival = random.uniform(1,100)
-            Duration = round(random.expovariate(1))+1
-            cur.execute("INSERT INTO dataset(id, arrival, duration) VALUES(?,?,?)", (ID, Arrival, Duration))
+    i = 10000 - len(cur.fetchall())
+    for _ in range(i):
+        ID = id_generator()
+        Arrival = random.uniform(1,10000)
+        Duration = math.ceil(random.expovariate(1))
+        cur.execute("INSERT INTO dataset(id, arrival, duration) VALUES(?,?,?)", (ID, Arrival, Duration))
     connection.commit()
     connection.close()
 
