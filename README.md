@@ -4,9 +4,9 @@
 A simulation system processing 10000 tasks with 3 processors.
 
 # Features
-- This system acquires tasks from the database and stores them in a queue. 
+- This system acquires tasks from the database and stores them in a queue which was built with linked list. 
 
-- The system check on the task IDs is carried out using regular expressions. 
+- The system check on the task IDs is carried out using Regular Expressions. 
 
 - At each step of the simulation, the simulation clock is updated to the next significant event, e.g.,task arrival, task processing completion.
 
